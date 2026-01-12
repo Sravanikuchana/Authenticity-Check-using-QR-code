@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>QR Scanner | AI Authenticity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .scanner-box {
+      background-color: #f9fafb;
+      border: 2px solid #2a73ff;
+      border-radius: 12px;
+      box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+      padding: 30px;
+      text-align: center;
+      width: 350px;
+    }
+  </style>
+</head>
+
+<body class="m-0 p-0 bg-[#d6ebed] min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="relative overflow-hidden bg-gradient-to-b from-[#04152e] to-[#4a6a82] h-[250px] flex items-center justify-center">
+    <div class="text-white text-center">
+      <h1 class="text-3xl font-bold">🔐 AI Authenticity</h1>
+      <p class="font-semibold mt-2">QR Code Scanner</p>
+    </div>
+  </header>
+
+  <!-- Scanner Section -->
+  <main class="flex-1 flex flex-col items-center justify-center p-6 -mt-20">
+    <div class="scanner-box">
+      <div id="my-qr-reader" class="border-4 border-[#2a73ff] rounded-xl shadow-md"></div>
+      <p id="scan-result" class="mt-4 text-lg font-semibold text-gray-700"></p>
+    </div>
+
+    <div class="mt-6">
+      <a href="result.html?show=history" class="inline-block">
+        <button class="bg-[#2a73ff] text-white font-semibold py-2 px-4 rounded hover:bg-[#1d5ccc] transition">
+          View Last Scan
+        </button>
+      </a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-6 text-center text-xs text-[#111827]">
+    © 2025 AI Authenticity System. All Rights Reserved.
+  </footer>
+
+  <script>
+    function onScanSuccess(decodeText) {
+      console.log("Scanned QR:", decodeText);
+      document.getElementById("scan-result").innerText = "Scanned: " + decodeText;
+
+      // Fast redirect to result page with scanned data
+      window.location.href = "result.html?data=" + encodeURIComponent(decodeText);
+
+      // Optional: save scan in the background
+      fetch("verify.php?data=" + encodeURIComponent(decodeText))
+        .then(res => res.json())
+        .then(result => {
+          fetch("save_scan.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: localStorage.getItem("user_email") || "guest@example.com",
+              qr_id: result.id || decodeText,
+              brand: result.brand || "Unknown",
+              status: result.status || "fake"
+            })
+          })
+          .then(r => r.json())
+          .then(resp => console.log("Save response:", resp))
+          .catch(err => console.error("Save error:", err));
+        })
+        .catch(err => console.error("Verification error:", err));
+    }
+
+    // Initialize QR scanner
+    const htmlscanner = new Html5QrcodeScanner("my-qr-reader", { fps: 10, qrbox: 250 });
+    htmlscanner.render(onScanSuccess);
+  </script>
+</body>
+</html>

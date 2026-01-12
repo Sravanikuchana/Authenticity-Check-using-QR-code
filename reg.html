@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | AI QR Authenticator</title>
+  <link rel="stylesheet" href="reg.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="register-container slide-in-right">
+    <h1>📝 Create Account</h1>
+    <p class="subtitle">Join the AI-powered QR system</p>
+    
+    <!-- ✅ Correct field names -->
+    <form action="reg.php" method="POST">
+      <input type="text" placeholder="Username" id="Username" name="Username" required />
+      <input type="email" placeholder="Email" id="Email" name="Email" required />
+      <input type="password" placeholder="Password" id="Password" name="Password" required />
+      <input type="password" placeholder="Confirm Password" id="Confirm_password" name="Confirm_password" required />
+      <button type="submit">Register</button>
+    </form>
+
+    <p class="link-note">
+      Already have an account? <a href="login.html">Login here</a>
+    </p>
+  </div>
+</body>
+</html>

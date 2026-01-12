@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin Dashboard | AI Authenticity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .cursor-pointer { cursor: pointer; }
+    .read { background-color: #f0fdf4; } /* Light green for read messages */
+    .unread { background-color: #fef3c7; } /* Light yellow for unread messages */
+  </style>
+</head>
+<body class="bg-[#d6ebed]">
+
+  <!-- NAVBAR -->
+  <header class="bg-gradient-to-r from-[#04152e] to-[#4a6a82] text-white px-6 py-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-3">
+      <button id="menuToggle" class="text-2xl focus:outline-none">☰</button>
+      <h1 class="text-lg font-bold">🛡️ Admin Panel</h1>
+    </div>
+    <a href="logout.html" class="text-sm font-semibold hover:text-green-400">Logout</a>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-60 bg-[#04152e] text-white transform -translate-x-full transition-transform duration-300 z-50 shadow-lg">
+    <nav class="mt-16 flex flex-col space-y-4 px-6">
+      <a href="admin.html" class="hover:text-green-400"><i class="fas fa-home mr-2"></i> Dashboard</a>
+      <a href="managing_users.html" class="hover:text-green-400"><i class="fas fa-users mr-2"></i> Manage Users</a>
+      <a href="scanner_history.html" class="hover:text-green-400"><i class="fas fa-history mr-2"></i> Scanner History</a>
+      <a href="reports.html" class="hover:text-green-400"><i class="fas fa-chart-line mr-2"></i> Reports</a>
+      <a href="#contact-messages" class="hover:text-green-400"><i class="fas fa-envelope mr-2"></i> Contact Messages</a>
+    </nav>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="p-6">
+
+    <!-- QUICK ACTIONS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <a href="managing_users.html" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-2xl transition transform hover:-translate-y-1">
+        <i class="fas fa-users text-3xl text-[#2a73ff] mb-4"></i>
+        <h3 class="text-lg font-semibold text-[#04152e] mb-2">Manage Users</h3>
+        <p class="text-sm text-[#4a6a82]">Add, Edit or Remove Users</p>
+      </a>
+      <a href="scanner_history.html" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-2xl transition transform hover:-translate-y-1">
+        <i class="fas fa-qrcode text-3xl text-green-500 mb-4"></i>
+        <h3 class="text-lg font-semibold text-[#04152e] mb-2">Scanner History</h3>
+        <p class="text-sm text-[#4a6a82]">Filter Real vs Fake scans</p>
+      </a>
+      <a href="reports.html" class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-2xl transition transform hover:-translate-y-1">
+        <i class="fas fa-chart-line text-3xl text-indigo-600 mb-4"></i>
+        <h3 class="text-lg font-semibold text-[#04152e] mb-2">Reports</h3>
+        <p class="text-sm text-[#4a6a82]">View analytics & charts</p>
+      </a>
+    </section>
+
+    <!-- CONTACT MESSAGES -->
+    <section id="contact-messages" class="mt-8 bg-white p-6 rounded-xl shadow-lg border border-[#22c55e]/40">
+      <h2 class="text-xl font-semibold mb-4 text-[#04152e]">📩 Contact Messages</h2>
+      <div id="messages" class="space-y-4 text-sm text-[#111827]"></div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-4 text-center text-xs text-[#111827] mt-6">
+    © 2025 AI Authenticity System. All Rights Reserved.
+  </footer>
+
+  <!-- JS for Sidebar and Contact Messages -->
+  <script>
+    // Sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const toggle = document.getElementById("menuToggle");
+
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle("-translate-x-full");
+    });
+    document.addEventListener("click", (e) => {
+      if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        sidebar.classList.add("-translate-x-full");
+      }
+    });
+    document.addEventListener("mousemove", (e) => {
+      if (e.clientX <= 20) {
+        sidebar.classList.remove("-translate-x-full");
+      }
+    });
+    sidebar.addEventListener("mouseleave", () => {
+      sidebar.classList.add("-translate-x-full");
+    });
+
+    // Load messages
+    async function loadMessages() {
+      try {
+        let res = await fetch("contact.json?nocache=" + new Date().getTime());
+        if (!res.ok) return;
+        let messages = await res.json();
+
+        const container = document.getElementById("messages");
+        container.innerHTML = "";
+        messages.forEach((msg, index) => {
+          container.innerHTML += `
+            <div class="border p-3 rounded-lg shadow-sm flex justify-between items-start ${msg.read ? 'read' : 'unread'}" data-index="${index}">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-envelope text-2xl mt-1 ${msg.read ? 'text-gray-400' : 'text-yellow-500'}"></i>
+                <div>
+                  <p><strong>Name:</strong> ${msg.name}</p>
+                  <p><strong>Email:</strong> ${msg.email}</p>
+                  <p><strong>Message:</strong> ${msg.message}</p>
+                  <p class="text-xs text-gray-500 mt-1">🕒 Sent at: ${msg.time}</p>
+                </div>
+              </div>
+              <div class="flex flex-col space-y-2 ml-4">
+                <button class="markRead bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">Mark Read</button>
+                <button class="deleteMsg bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+
+        // Add event listeners
+        document.querySelectorAll(".markRead").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const card = e.target.closest("[data-index]");
+            const idx = card.getAttribute("data-index");
+            messages[idx].read = true;
+            await saveMessages(messages);
+            loadMessages();
+          });
+        });
+        document.querySelectorAll(".deleteMsg").forEach(btn => {
+          btn.addEventListener("click", async (e) => {
+            const card = e.target.closest("[data-index]");
+            const idx = card.getAttribute("data-index");
+            messages.splice(idx, 1);
+            await saveMessages(messages);
+            loadMessages();
+          });
+        });
+
+      } catch (err) {
+        console.error("Error loading messages", err);
+      }
+    }
+
+    async function saveMessages(messages) {
+      try {
+        await fetch("save_contact.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(messages)
+        });
+      } catch (err) {
+        console.error("Error saving messages", err);
+      }
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>

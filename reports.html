@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Reports | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .cursor-pointer { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-[#d6ebed]">
+
+  <!-- NAVBAR -->
+  <header class="bg-gradient-to-r from-[#04152e] to-[#4a6a82] text-white px-6 py-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-3">
+      <button id="menuToggle" class="text-2xl focus:outline-none">☰</button>
+      <h1 class="text-lg font-bold">🛡️ Admin Panel</h1>
+    </div>
+    <a href="logout.html" class="text-sm font-semibold hover:text-green-400">Logout</a>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-60 bg-[#04152e] text-white transform -translate-x-full transition-transform duration-300 z-50 shadow-lg">
+    <nav class="mt-16 flex flex-col space-y-4 px-6">
+      <a href="admin.html" class="hover:text-green-400"><i class="fas fa-home mr-2"></i> Dashboard</a>
+      <a href="manage_users.html" class="hover:text-green-400"><i class="fas fa-users mr-2"></i> Manage Users</a>
+      <a href="scanner_history.html" class="hover:text-green-400"><i class="fas fa-history mr-2"></i> Scanner History</a>
+      <a href="reports.html" class="text-green-400 font-semibold"><i class="fas fa-chart-line mr-2"></i> Reports</a>
+      <a href="support.html" class="hover:text-green-400"><i class="fas fa-headset mr-2"></i> Support</a>
+    </nav>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="p-6">
+    <h2 class="text-2xl font-bold text-[#04152e] mb-4">Reports & Analytics</h2>
+
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-4 mb-6">
+      <input type="text" id="userFilter" placeholder="Filter by User" class="px-4 py-2 rounded border border-gray-300 focus:outline-none">
+      <input type="date" id="fromDate" class="px-4 py-2 rounded border border-gray-300">
+      <input type="date" id="toDate" class="px-4 py-2 rounded border border-gray-300">
+      <button id="applyFilter" class="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600">Apply</button>
+      <button id="resetFilter" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Reset</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="flex gap-4 mb-6 flex-wrap">
+      <div class="bg-white rounded-xl shadow-lg p-4 text-center w-40">
+        <h3 class="text-sm font-semibold text-gray-500">Total Scans</h3>
+        <p id="totalScans" class="text-2xl font-bold text-[#2a73ff]">0</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-4 text-center w-40">
+        <h3 class="text-sm font-semibold text-gray-500">Real QRs</h3>
+        <p id="realCount" class="text-2xl font-bold text-green-600">0</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-4 text-center w-40">
+        <h3 class="text-sm font-semibold text-gray-500">Fake QRs</h3>
+        <p id="fakeCount" class="text-2xl font-bold text-red-600">0</p>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-xl shadow-lg p-4">
+        <h3 class="text-lg font-semibold mb-2">Real vs Fake QRs</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-4">
+        <h3 class="text-lg font-semibold mb-2">Scans Over Time</h3>
+        <canvas id="lineChart"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-4 text-center text-xs text-[#111827] mt-6">
+    © 2025 AI Authenticity System. All Rights Reserved.
+  </footer>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const toggle = document.getElementById("menuToggle");
+    toggle.addEventListener("click", (e) => { e.stopPropagation(); sidebar.classList.toggle("-translate-x-full"); });
+    document.addEventListener("click", (e) => { if(!sidebar.contains(e.target) && !toggle.contains(e.target)) sidebar.classList.add("-translate-x-full"); });
+    document.addEventListener("mousemove", (e) => { if(e.clientX<=20) sidebar.classList.remove("-translate-x-full"); });
+    sidebar.addEventListener("mouseleave",()=> sidebar.classList.add("-translate-x-full"));
+
+    const totalScansEl = document.getElementById("totalScans");
+    const realCountEl = document.getElementById("realCount");
+    const fakeCountEl = document.getElementById("fakeCount");
+    const userFilter = document.getElementById("userFilter");
+    const fromDate = document.getElementById("fromDate");
+    const toDate = document.getElementById("toDate");
+    const applyFilter = document.getElementById("applyFilter");
+    const resetFilter = document.getElementById("resetFilter");
+    const pieCtx = document.getElementById("pieChart").getContext("2d");
+    const lineCtx = document.getElementById("lineChart").getContext("2d");
+    let pieChart, lineChart;
+    let historyData = [];
+
+    async function fetchHistory() {
+      const res = await fetch("fetch_scanner_history.php");
+      historyData = await res.json();
+
+      // Map to your previous format
+      historyData = historyData.map(item => ({
+        user: item.email,
+        date: item.date,
+        result: item.status === "valid" ? "Real" : "Fake"
+      }));
+
+      updateCounts(historyData);
+      updateCharts(historyData);
+    }
+
+    function updateCounts(data) {
+      totalScansEl.textContent = data.length;
+      realCountEl.textContent = data.filter(d=>d.result==="Real").length;
+      fakeCountEl.textContent = data.filter(d=>d.result==="Fake").length;
+    }
+
+    function getFilteredData() {
+      const userVal = userFilter.value.toLowerCase();
+      const fromVal = fromDate.value;
+      const toVal = toDate.value;
+      return historyData.filter(d=>{
+        let ok = true;
+        if(userVal && !d.user.toLowerCase().includes(userVal)) ok=false;
+        if(fromVal && d.date<fromVal) ok=false;
+        if(toVal && d.date>toVal) ok=false;
+        return ok;
+      });
+    }
+
+    applyFilter.addEventListener("click", () => {
+      const filtered = getFilteredData();
+      updateCounts(filtered);
+      updateCharts(filtered);
+    });
+
+    resetFilter.addEventListener("click", () => {
+      userFilter.value=""; fromDate.value=""; toDate.value="";
+      updateCounts(historyData);
+      updateCharts(historyData);
+    });
+
+    function updateCharts(data){
+      const real = data.filter(d=>d.result==="Real").length;
+      const fake = data.filter(d=>d.result==="Fake").length;
+
+      // Pie Chart
+      if(pieChart) pieChart.destroy();
+      pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: { labels:['Real','Fake'], datasets:[{ data:[real,fake], backgroundColor:['#16a34a','#dc2626'] }] },
+        options:{responsive:true}
+      });
+
+      // Line chart over time
+      const dateMap = {};
+      data.forEach(d => {
+        dateMap[d.date] = dateMap[d.date] ? {...dateMap[d.date], [d.result]:(dateMap[d.date][d.result]||0)+1} : {[d.result]:1};
+      });
+      const labels = Object.keys(dateMap).sort();
+      const realData = labels.map(l=>dateMap[l].Real||0);
+      const fakeData = labels.map(l=>dateMap[l].Fake||0);
+
+      if(lineChart) lineChart.destroy();
+      lineChart = new Chart(lineCtx,{
+        type:'line',
+        data:{ labels:labels, datasets:[
+          {label:'Real', data:realData, borderColor:'#16a34a', fill:false, tension:0.3},
+          {label:'Fake', data:fakeData, borderColor:'#dc2626', fill:false, tension:0.3}
+        ]},
+        options:{responsive:true, plugins:{legend:{position:'top'}}}
+      });
+    }
+
+    fetchHistory();
+  </script>
+
+</body>
+</html>

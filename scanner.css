@@ -1,0 +1,73 @@
+/* Overall light theme */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #d6ebed, #a1b9bf);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container (white card) */
+.container {
+    width: 100%;
+    max-width: 480px;
+    background-color: #f9fafb; /* Light card background */
+    padding: 32px 24px;
+    margin: 20px;
+    border: 2px solid #2a73ff; /* Light blue border */
+    border-radius: 16px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+/* Title/Header */
+.container h1 {
+    color: #111827; /* Soft black text */
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* QR Code Reader Area */
+#my-qr-reader {
+    background-color: #ffffff;
+    padding: 16px !important;
+    border: 2px solid #2a73ff !important;
+    border-radius: 12px !important;
+    height: 300px;
+}
+
+/* Hide QR reader's extra icons */
+#my-qr-reader img[alt="Info icon"],
+#my-qr-reader img[alt="Camera based scan"] {
+    display: none;
+}
+
+/* Buttons */
+button {
+    margin-top: 20px;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    background-color: #2a73ff; /* Theme blue */
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #1d5ccc; /* Slightly darker on hover */
+}
+
+/* Camera Stream Styling */
+video {
+    width: 100% !important;
+    border-radius: 12px !important;
+    margin-top: 10px;
+}

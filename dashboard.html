@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dashboard | AI Authenticity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .cursor-pointer { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-[#d6ebed]">
+
+  <!-- NAVBAR -->
+  <header class="bg-gradient-to-r from-[#04152e] to-[#4a6a82] text-white px-6 py-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-3">
+      <button id="menuToggle" class="text-2xl focus:outline-none">
+        ☰
+      </button>
+      <h1 class="text-lg font-bold">🔐 AI Authenticity</h1>
+    </div>
+    <a href="logout.html" class="text-sm font-semibold hover:text-green-400">Logout</a>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-60 bg-[#04152e] text-white transform -translate-x-full transition-transform duration-300 z-50 shadow-lg">
+    <nav class="mt-16 flex flex-col space-y-4 px-6">
+      <a href="dashboard.html" class="hover:text-green-400"><i class="fas fa-home mr-2"></i> Dashboard</a>
+      <a href="page1.html" class="hover:text-green-400"><i class="fas fa-qrcode mr-2"></i> How to Scan QR</a>
+      <a href="scanner.html" class="hover:text-green-400"><i class="fas fa-upload mr-2"></i> Upload QR</a>
+      <a href="aboutus.html" class="hover:text-green-400"><i class="fas fa-history mr-2"></i> About Us</a>
+      <a href="contact.html" class="hover:text-green-400"><i class="fas fa-headset mr-2"></i> Support</a>
+    </nav>
+  </div>
+
+  <!-- WELCOME SECTION -->
+  <section class="text-center py-10">
+    <h2 class="text-3xl font-extrabold text-[#04152e]">Welcome back, <span class="text-[#2a73ff]">User</span>!</h2>
+    <p class="text-[#111827] mt-2 font-medium">Securely manage and verify QR codes with AI assistance.</p>
+  </section>
+
+  <!-- FEATURE CARDS -->
+  <section class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6 pb-16">
+
+    <!-- Card 1: Scan QR Code -->
+    <a href="steps.html" class="block">
+      <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-2xl transition transform hover:-translate-y-1 cursor-pointer">
+        <i class="fas fa-qrcode text-3xl text-[#2a73ff] mb-4"></i>
+        <h3 class="text-lg font-semibold text-[#04152e] mb-2">📷 How to Scan QR Code</h3>
+        <p class="text-sm text-[#4a6a82]">Use your device camera to validate authenticity instantly.</p>
+      </div>
+    </a>
+
+    <!-- Card 2: Upload QR -->
+    <a href="scanner.html" class="block">
+      <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-2xl transition transform hover:-translate-y-1 cursor-pointer">
+        <i class="fas fa-upload text-3xl text-green-500 mb-4"></i>
+        <h3 class="text-lg font-semibold text-[#04152e] mb-2">📂 Upload QR</h3>
+        <p class="text-sm text-[#4a6a82]">Upload a QR image to verify it manually using AI.</p>
+      </div>
+    </a>
+
+    <!-- Card 3: About Us -->
+    <a href="aboutus.html" class="block">
+      <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-2xl transition transform hover:-translate-y-1 cursor-pointer">
+        <i class="fas fa-history text-3xl text-indigo-600 mb-4"></i>
+        <h3 class="text-lg font-semibold text-[#04152e] mb-2">📜 About Us</h3>
+        <p class="text-sm text-[#4a6a82]">Check your past verification records securely.</p>
+      </div>
+    </a>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-6 text-center text-xs text-[#111827]">
+    © 2025 AI Authenticity System. All Rights Reserved.
+  </footer>
+
+  <!-- JS for Sidebar -->
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const toggle = document.getElementById("menuToggle");
+
+    // Sidebar toggle
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle("-translate-x-full");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        sidebar.classList.add("-translate-x-full");
+      }
+    });
+
+    // Sidebar auto-open on hover
+    document.addEventListener("mousemove", (e) => {
+      if (e.clientX <= 20) {
+        sidebar.classList.remove("-translate-x-full");
+      }
+    });
+  </script>
+
+</body>
+</html>

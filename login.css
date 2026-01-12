@@ -1,0 +1,138 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #d6ebed, #e4f3f6, #f0fcff); /* soft light gradient */
+  font-family: 'Inter', sans-serif; /* changed to default homepage font */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  color: #111827;
+}
+
+.login-container {
+  position: relative;
+  width: 360px;
+  padding: 40px 30px;
+  background: rgba(255, 255, 255, 0.6); /* glassy white */
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(100, 149, 237, 0.3); /* subtle blue glow */
+  border: 2px solid rgba(100, 149, 237, 0.3);
+  overflow: hidden;
+  animation: slideUp 1s ease forwards;
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+/* Animated glowing border */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  border: 2px solid rgba(100, 149, 237, 0.5);
+  border-radius: 18px;
+  pointer-events: none;
+  box-shadow: 0 0 15px rgba(100, 149, 237, 0.3);
+  animation: borderPulse 2s linear infinite;
+}
+
+@keyframes borderPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e90ff; /* light friendly blue */
+  text-align: center;
+}
+
+.subtitle {
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #4682b4; /* soft text color */
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(100, 149, 237, 0.1); /* light input background */
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+}
+
+input::placeholder {
+  color: #5f9ea0;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #1e90ff; /* light blue button */
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+button:hover {
+  background: #4682b4; /* lighter hover shade */
+  box-shadow: 0 0 12px rgba(30, 144, 255, 0.4);
+}
+
+.link-note {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #4682b4;
+  text-align: center;
+}
+
+a {
+  color: #1e90ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #4682b4;
+}
+
+/* Slide animation */
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animated scanning line inside login box */
+.login-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.8), transparent);
+  animation: scanLine 2s linear infinite;
+}
+
+@keyframes scanLine {
+  0% { left: -50%; }
+  100% { left: 100%; }
+}

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Manage Products | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-100">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#04152e] text-white flex flex-col">
+      <div class="px-6 py-4 text-2xl font-bold border-b border-gray-700">Admin Panel</div>
+      <nav class="flex-1 p-4 space-y-2">
+        <a href="dashboard.html" class="block py-2 px-4 rounded hover:bg-[#2a73ff]"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a>
+        <a href="manage_users.html" class="block py-2 px-4 rounded hover:bg-[#2a73ff]"><i class="fas fa-users mr-2"></i> Manage Users</a>
+        <a href="manage_products.html" class="block py-2 px-4 rounded bg-[#2a73ff]"><i class="fas fa-box mr-2"></i> Manage Products</a>
+        <a href="scanner_history.html" class="block py-2 px-4 rounded hover:bg-[#2a73ff]"><i class="fas fa-history mr-2"></i> Scan History</a>
+        <a href="reports.html" class="block py-2 px-4 rounded hover:bg-[#2a73ff]"><i class="fas fa-chart-line mr-2"></i> Reports</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h1 class="text-2xl font-bold mb-6">Manage Products</h1>
+
+      <!-- Add Product Button -->
+      <button onclick="openModal()" class="mb-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+        <i class="fas fa-plus mr-1"></i> Add Product
+      </button>
+
+      <!-- Products Table -->
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="w-full text-left">
+          <thead class="bg-gray-200">
+            <tr>
+              <th class="px-4 py-2">ID</th>
+              <th class="px-4 py-2">Name</th>
+              <th class="px-4 py-2">Brand</th>
+              <th class="px-4 py-2">Status</th>
+              <th class="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable" class="divide-y divide-gray-200"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="productModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 id="modalTitle" class="text-xl font-bold mb-4">Add Product</h2>
+      <form id="productForm">
+        <input type="hidden" id="productId" />
+        <label class="block mb-2">Name</label>
+        <input id="name" class="w-full p-2 border rounded mb-4" required/>
+        <label class="block mb-2">Brand</label>
+        <input id="brand" class="w-full p-2 border rounded mb-4" required/>
+        <label class="block mb-2">Status</label>
+        <select id="status" class="w-full p-2 border rounded mb-4">
+          <option value="active">Active</option>
+          <option value="revoked">Revoked</option>
+        </select>
+        <div class="flex justify-end space-x-2">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-400 text-white rounded">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+async function fetchProducts() {
+  const res = await fetch("fetch_products.php");
+  const data = await res.json();
+  const table = document.getElementById("productsTable");
+  table.innerHTML = "";
+  data.forEach(p => {
+    table.innerHTML += `
+      <tr>
+        <td class="px-4 py-2">${p.id}</td>
+        <td class="px-4 py-2">${p.name}</td>
+        <td class="px-4 py-2">${p.brand}</td>
+        <td class="px-4 py-2">${p.status}</td>
+        <td class="px-4 py-2">
+          <button onclick="editProduct('${p.id}','${p.name}','${p.brand}','${p.status}')" class="text-blue-600 mr-2">Edit</button>
+          <button onclick="deleteProduct('${p.id}')" class="text-red-600">Delete</button>
+        </td>
+      </tr>`;
+  });
+}
+
+function openModal() {
+  document.getElementById("productForm").reset();
+  document.getElementById("modalTitle").innerText = "Add Product";
+  document.getElementById("productId").value = "";
+  document.getElementById("productModal").classList.remove("hidden");
+}
+
+function closeModal() {
+  document.getElementById("productModal").classList.add("hidden");
+}
+
+function editProduct(id, name, brand, status) {
+  document.getElementById("modalTitle").innerText = "Edit Product";
+  document.getElementById("productId").value = id;
+  document.getElementById("name").value = name;
+  document.getElementById("brand").value = brand;
+  document.getElementById("status").value = status;
+  document.getElementById("productModal").classList.remove("hidden");
+}
+
+document.getElementById("productForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const id = document.getElementById("productId").value;
+  const name = document.getElementById("name").value;
+  const brand = document.getElementById("brand").value;
+  const status = document.getElementById("status").value;
+  const url = id ? "update_product.php" : "add_product.php";
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, name, brand, status })
+  });
+  closeModal();
+  fetchProducts();
+});
+
+async function deleteProduct(id) {
+  if(confirm("Delete this product?")) {
+    await fetch("delete_product.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    });
+    fetchProducts();
+  }
+}
+
+fetchProducts();
+</script>
+</body>
+</html>

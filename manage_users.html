@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Manage Users | AI Authenticity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .cursor-pointer { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-[#d6ebed]">
+
+  <!-- NAVBAR -->
+  <header class="bg-gradient-to-r from-[#04152e] to-[#4a6a82] text-white px-6 py-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center space-x-3">
+      <button id="menuToggle" class="text-2xl focus:outline-none">☰</button>
+      <h1 class="text-lg font-bold">🛡️ Manage Users</h1>
+    </div>
+    <a href="logout.html" class="text-sm font-semibold hover:text-green-400">Logout</a>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="fixed top-0 left-0 h-full w-60 bg-[#04152e] text-white transform -translate-x-full transition-transform duration-300 z-50 shadow-lg">
+    <nav class="mt-16 flex flex-col space-y-4 px-6">
+      <a href="admin.html" class="hover:text-green-400"><i class="fas fa-home mr-2"></i> Dashboard</a>
+      <a href="manage_users.html" class="hover:text-green-400"><i class="fas fa-users mr-2"></i> Manage Users</a>
+      <a href="scanner_history.html" class="hover:text-green-400"><i class="fas fa-history mr-2"></i> Scanner History</a>
+      <a href="reports.html" class="hover:text-green-400"><i class="fas fa-chart-line mr-2"></i> Reports</a>
+      <a href="support.html" class="hover:text-green-400"><i class="fas fa-headset mr-2"></i> Support</a>
+    </nav>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="p-6">
+    <h1 class="text-2xl font-bold mb-4 text-[#04152e]">Manage Users</h1>
+
+    <!-- Add/Edit User Form -->
+    <form id="userForm" class="bg-white p-6 rounded-xl shadow mb-6">
+      <input type="hidden" id="userId" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input type="text" id="username" placeholder="Username" class="border p-2 rounded" required>
+        <input type="email" id="email" placeholder="Email" class="border p-2 rounded" required>
+        <input type="password" id="password" placeholder="Password" class="border p-2 rounded" required>
+        <input type="password" id="confirm_password" placeholder="Confirm Password" class="border p-2 rounded" required>
+      </div>
+      <button type="submit" class="mt-4 bg-[#2a73ff] text-white px-4 py-2 rounded shadow hover:bg-[#1a5ed1] transition">Save</button>
+    </form>
+
+    <!-- Users Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full bg-white rounded-xl shadow border">
+        <thead class="bg-[#4a6a82] text-white">
+          <tr>
+            <th class="p-2 border">Username</th>
+            <th class="p-2 border">Email</th>
+            <th class="p-2 border">Password</th>
+            <th class="p-2 border">Confirm Password</th>
+            <th class="p-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody" class="text-center"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-4 text-center text-xs text-[#111827] mt-6">
+    © 2025 AI Authenticity System. All Rights Reserved.
+  </footer>
+
+  <!-- JS -->
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const toggle = document.getElementById("menuToggle");
+
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle("-translate-x-full");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+        sidebar.classList.add("-translate-x-full");
+      }
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (e.clientX <= 20) {
+        sidebar.classList.remove("-translate-x-full");
+      }
+    });
+
+    sidebar.addEventListener("mouseleave", () => {
+      sidebar.classList.add("-translate-x-full");
+    });
+
+    // Fetch all users
+    async function fetchUsers() {
+      const res = await fetch("fetch_user.php");
+      const data = await res.json();
+      const tbody = document.getElementById("userTableBody");
+      tbody.innerHTML = "";
+
+      data.forEach(user => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="border p-2">${user.username}</td>
+          <td class="border p-2">${user.email}</td>
+          <td class="border p-2">${user.password}</td>
+          <td class="border p-2">${user.Confirm_password}</td>
+          <td class="border p-2">
+            <button onclick="editUser('${user.username}', '${user.email}','${user.password}','${user.Confirm_password}')" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+            <button onclick="deleteUser('${user.email}')" class="bg-red-600 text-white px-2 py-1 rounded">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editUser(username, email, password, confirm_password) {
+      document.getElementById("username").value = username;
+      document.getElementById("email").value = email;
+      document.getElementById("password").value = password;
+      document.getElementById("confirm_password").value = confirm_password;
+    }
+
+    async function deleteUser(email) {
+      if (!confirm("Delete user with email: " + email + "?")) return;
+
+      const res = await fetch("delete_user.php", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert("User deleted!");
+        fetchUsers();
+      } else {
+        alert("Delete failed: " + data.error);
+      }
+    }
+
+    document.getElementById("userForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirm_password = document.getElementById("confirm_password").value;
+
+      const url = "add_user.php";
+
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({ username, email, password, confirm_password }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert("User saved!");
+        document.getElementById("userForm").reset();
+        fetchUsers();
+      } else {
+        alert("Save failed: " + data.error);
+      }
+    });
+
+    fetchUsers();
+  </script>
+</body>
+</html>

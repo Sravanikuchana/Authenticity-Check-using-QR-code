@@ -1,0 +1,169 @@
+/* ===========================
+   DEFAULT FONT FOR ALL PAGES
+   =========================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif; /* default homepage font */
+}
+
+/* ===========================
+   BODY BACKGROUND
+   =========================== */
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #d6ebed, #e4f3f6, #f0fcff); /* light soft gradient */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  color: #111827;
+}
+
+/* ===========================
+   REGISTER CONTAINER
+   =========================== */
+.register-container {
+  position: relative;
+  width: 380px;
+  padding: 40px 30px;
+  background: rgba(255, 255, 255, 0.6); /* glassy white */
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(100, 149, 237, 0.3); /* subtle blue glow */
+  border: 2px solid rgba(100, 149, 237, 0.3);
+  overflow: hidden;
+  animation: slideRight 1s ease forwards;
+  opacity: 0;
+  transform: translateX(100%);
+}
+
+/* Animated glowing border */
+.register-container::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  border: 2px solid rgba(100, 149, 237, 0.5);
+  border-radius: 18px;
+  pointer-events: none;
+  box-shadow: 0 0 15px rgba(100, 149, 237, 0.3);
+  animation: borderPulse 2s linear infinite;
+}
+
+@keyframes borderPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Animated scan line inside card */
+.register-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(30, 144, 255, 0.8), transparent);
+  animation: scanLine 2s linear infinite;
+}
+
+@keyframes scanLine {
+  0% { left: -50%; }
+  100% { left: 100%; }
+}
+
+/* ===========================
+   HEADINGS & TEXT
+   =========================== */
+.register-container h1 {
+  margin-bottom: 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e90ff;
+  text-align: center;
+}
+
+.register-container .subtitle {
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: #4682b4;
+  text-align: center;
+}
+
+/* ===========================
+   INPUTS
+   =========================== */
+.register-container input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(100, 149, 237, 0.1);
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+}
+
+.register-container input::placeholder {
+  color: #5f9ea0;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.register-container button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #1e90ff;
+  color: #ffffff;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.register-container button:hover {
+  background: #4682b4;
+  box-shadow: 0 0 12px rgba(30, 144, 255, 0.4);
+}
+
+/* ===========================
+   LINKS
+   =========================== */
+.register-container .link-note {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #4682b4;
+  text-align: center;
+}
+
+.register-container a {
+  color: #1e90ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-container a:hover {
+  text-decoration: underline;
+  color: #4682b4;
+}
+
+/* ===========================
+   ANIMATIONS
+   =========================== */
+@keyframes slideRight {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

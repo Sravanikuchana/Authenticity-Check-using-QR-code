@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>AI Authenticity - QR Result</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  .result-box { 
+    background-color: #f9fafb; 
+    border: 2px solid #2a73ff; 
+    border-radius: 12px; 
+    box-shadow: 0 15px 25px rgba(0,0,0,0.2); 
+    padding: 30px; 
+    text-align: left; 
+    word-break: break-word;
+  }
+  .scan-table th, .scan-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+  .scan-table th {
+    background-color: #2a73ff;
+    color: white;
+  }
+</style>
+</head>
+<body class="m-0 p-0 bg-[#d6ebed]">
+
+<header class="relative overflow-hidden bg-gradient-to-b from-[#04152e] to-[#4a6a82] h-[250px] flex items-center justify-center">
+  <div class="text-white text-center">
+    <h1 class="text-3xl font-bold">🔐 AI Authenticity</h1>
+    <p class="font-semibold mt-2">Scanned QR Code Details</p>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-6 py-10">
+  <div class="result-box mb-6">
+    <h2 class="text-xl font-semibold mb-4 text-[#111827]">Verification Result:</h2>
+    <p id="qr-result" class="text-lg">Checking...</p>
+  </div>
+
+  <div class="mb-8">
+    <a href="scanner.html" class="inline-block">
+      <button class="bg-[#2a73ff] text-white font-semibold py-2 px-4 rounded hover:bg-[#1d5ccc]">
+        Scan Another QR
+      </button>
+    </a>
+  </div>
+
+  <div class="result-box">
+    <h2 class="text-xl font-semibold mb-4 text-[#111827]">Your Scan History:</h2>
+    <div class="overflow-x-auto">
+      <table class="scan-table w-full text-left">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>QR ID</th>
+            <th>Brand</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="scan-history-body">
+          <tr><td colspan="5">Loading your scan history...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer class="bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-6 text-center text-xs text-[#111827]">
+  © 2025 AI Authenticity System. All Rights Reserved.
+</footer>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const qrData = urlParams.get("data");
+const showHistoryOnly = urlParams.get("show") === "history";
+const resultEl = document.getElementById("qr-result");
+const scanBody = document.getElementById("scan-history-body");
+
+// Function to load user's scan history
+function loadScanHistory() {
+  const userEmail = localStorage.getItem("user_email") || "guest@example.com";
+  fetch('fetch_scanner_history.php?email=' + encodeURIComponent(userEmail))
+    .then(res => res.json())
+    .then(history => {
+      scanBody.innerHTML = '';
+      if (history.error) {
+        scanBody.innerHTML = `<tr><td colspan="5" class="text-red-600">${history.error}</td></tr>`;
+      } else if (history.length > 0) {
+        history.forEach(row => {
+          scanBody.innerHTML += `
+            <tr>
+              <td>${row.email}</td>
+              <td>${row.qr_id}</td>
+              <td>${row.brand}</td>
+              <td>${row.status === 'valid' ? '✅ Valid' : '❌ Fake'}</td>
+              <td>${row.date}</td>
+            </tr>
+          `;
+        });
+      } else {
+        scanBody.innerHTML = '<tr><td colspan="5">No scans found for your account yet.</td></tr>';
+      }
+    })
+    .catch(() => {
+      scanBody.innerHTML = '<tr><td colspan="5" class="text-red-600">Could not load scan history.</td></tr>';
+    });
+}
+
+// Show history if button clicked
+if (showHistoryOnly) {
+  resultEl.innerText = "Showing your scan history below:";
+  loadScanHistory();
+}
+// QR scan flow
+else if (qrData) {
+  fetch(`verify.php?data=${encodeURIComponent(qrData)}`)
+    .then(res => res.json())
+    .then(data => {
+      let brand = data.brand || "";
+      let status = data.status || "fake";
+
+      if (data.status === "valid") {
+        resultEl.innerHTML = `
+          ✅ Authentic <br>
+          <b>ID:</b> ${data.id}<br>
+          <b>Name:</b> ${data.name}<br>
+          <b>Brand:</b> ${data.brand}<br>
+          <b>Created At:</b> ${data.created_at}
+        `;
+        resultEl.classList.remove("text-red-600");
+        resultEl.classList.add("text-green-600");
+      } else {
+        resultEl.innerHTML = `
+          ❌ Fake <br>
+          <b>Message:</b> ${data.message}
+        `;
+        resultEl.classList.remove("text-green-600");
+        resultEl.classList.add("text-red-600");
+      }
+
+      // Save scan
+      fetch(`save_scan.php?data=${encodeURIComponent(qrData)}&brand=${encodeURIComponent(brand)}&status=${encodeURIComponent(status)}&email=${encodeURIComponent(localStorage.getItem("user_email") || "guest@example.com")}`)
+        .then(() => loadScanHistory());
+    })
+    .catch(() => {
+      resultEl.innerText = "⚠️ Could not connect to server.";
+    });
+}
+// No data
+else {
+  resultEl.innerText = "No QR data found!";
+  loadScanHistory();
+}
+</script>
+</body>
+</html>

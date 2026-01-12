@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Logout | AI Authenticity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-[#d6ebed] flex items-center justify-center min-h-screen">
+
+  <!-- Logout Card -->
+  <div class="bg-white shadow-2xl rounded-xl p-10 max-w-md w-full text-center">
+    <i class="fas fa-sign-out-alt text-5xl text-red-500 mb-4"></i>
+    <h1 class="text-2xl font-extrabold text-[#04152e] mb-2">You’ve been logged out</h1>
+    <p class="text-[#4a6a82] mb-6">Thank you for using <span class="font-semibold text-[#2a73ff]">AI Authenticity</span>.  
+    For security, please close your browser if on a public computer.</p>
+
+    <div class="flex flex-col space-y-3">
+      <a href="login.html" class="w-full bg-[#2a73ff] hover:bg-[#1d5edb] text-white py-2 rounded-lg font-semibold transition">
+        <i class="fas fa-sign-in-alt mr-2"></i>Login Again
+      </a>
+      <a href="index.php" class="w-full bg-[#111827] hover:bg-[#333f4f] text-white py-2 rounded-lg font-semibold transition">
+        <i class="fas fa-home mr-2"></i>Back to Home
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="absolute bottom-0 left-0 right-0 bg-gradient-to-b from-[#a1b9bf] to-[#d6ebed] py-4 text-center text-xs text-[#111827]">
+    © 2025 AI Authenticity System. All Rights Reserved.
+  </footer>
+
+</body>
+</html>
