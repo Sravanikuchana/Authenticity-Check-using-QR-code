@@ -16,7 +16,7 @@ if ($con->connect_error) {
 
 // Admin credentials hardcoded
 $adminCredentials = [
-    "ishukuchana@gmail.com" => "2005",
+    "ishukuchana@gmail.com" => "ABCDE$",
     
 ];
 
